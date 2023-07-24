@@ -413,9 +413,66 @@ paginateAPI <- function(url,
 
 
 
+#' Generic function to retrieve data from the Disqus API in different formats.
+#'
+#' This function is a wrapper around other functions in the package, providing a generic interface to interact with the Disqus API. It allows users to retrieve data from the API in either a 'tidy', unnested format or 'raw' (JSON) format. The function generates the appropriate URL for the API call using the provided resource, option, and additional arguments, and then makes paginated API calls to retrieve the data. Optionally, a second API key can be provided to handle the hourly API limit.
+#'
+#' @param ressource Character vector specifying the type of resource to access through the API.
+#' @param option Character vector specifying the specific API operation to perform.
+#' @param key Character vector containing the primary API key to authenticate the API call(s).
+#' @param second_key Character vector containing a second API key to use if the hourly API limit is reached with the primary key (default is NULL).
+#' @param verbose Logical value indicating whether to display informative messages during the API calls (default is TRUE).
+#' @param n The maximum number of observations to retrieve (default is 100).
+#' @param limit Numeric value specifying the maximum number of items to return in each API response (default is 25).
+#' @param format Character vector specifying the desired output format: 'tidy' (unnested) or 'raw' (JSON) (default is 'tidy').
+#' @param ... Additional arguments to be passed to the `generateURL` function.
+#'
+#' @return The retrieved data from the Disqus API in the specified format.
+#'
+#' @seealso `generateURL`, `paginateAPI`, `unnest_recursively`
+#'
+#' @examples
+#' # Retrieve data in 'tidy' format using the primary key
+#' # tidy_data <- get_generic(ressource = "forums", option = "listThreads", key = "YOURAPPKEY")
+#'
+#'
+#' @export
+get_generic <- function(ressource,
+                        option,
+                        key,
+                        second_key = NULL,
+                        verbose = TRUE,
+                        n = 100,
+                        limit = 25,
+                        format = c("tidy", "raw"),
+                        ...){
 
+  # Generate url, pass additional arguments
+  url <- generateURL(ressource = ressource,
+                     option = option,
+                     limit = limit,
+                     ...)
 
+  # Make paginated API call, optionally using a second API key
+  con <- paginateAPI(url = url,
+                     key = key,
+                     second_key = second_key,
+                     verbose = verbose,
+                     n = n)
 
+  # Check which output format
+  format <- match.arg(format, c("tidy", "raw"))
+
+  if(format == "tidy"){
+    con <- do.call(rbind, con) |> tibble::as_tibble()
+    con <- unnest_recursively(con)
+    return(con)
+  }
+
+  if(format == "raw"){
+    return(con)
+  }
+}
 
 
 

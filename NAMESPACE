@@ -2,6 +2,8 @@
 
 export(callAPI)
 export(generateURL)
+export(get_generic)
+export(get_thread_list)
 export(leechAPI)
 export(paginateAPI)
 export(unnest_recursively)
