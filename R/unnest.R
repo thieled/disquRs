@@ -34,7 +34,7 @@
 #' )
 #'
 #' # Use do.call("rbind") to transform into data.frame
-#' df <- do.call("rbind", l) |> tibble::as_tibble()
+#' df <- do.call("rbind", l) |> as.data.frame()
 #'
 #' # Unnest recursively:
 #' unnested_df <- unnest_recursively(df)
