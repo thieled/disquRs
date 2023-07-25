@@ -371,42 +371,49 @@ paginateAPI <- function(url,
   con <- content$response
   len <- length(con); if (verbose) cat(len, "obs. ")
 
-  # Check if there's more
-  while (len<n && content$cursor$hasNext == TRUE){
-    # waiting before making next API call...
-    Sys.sleep(0.1)
+  # Check if cursor exists
+  if (is.null(content$cursor)){
+    return(con)
+    } else {
 
-    cursor <- content$cursor$`next`
+    # Check if there's more
+    while (len<n && content$cursor$hasNext == TRUE){
+      # waiting before making next API call...
+      Sys.sleep(0.1)
 
-    # Replace old cursor if in url
-    if(grepl("&cursor=", url)){
-      newcursor <- paste0("&cursor=", cursor)
-      nxt_url <- gsub("(&cursor=.+(?=\\&)|&cursor=.+$)", newcursor, url, perl = TRUE)
+      cursor <- content$cursor$`next`
+
+      # Replace old cursor if in url
+      if(grepl("&cursor=", url)){
+        newcursor <- paste0("&cursor=", cursor)
+        nxt_url <- gsub("(&cursor=.+(?=\\&)|&cursor=.+$)", newcursor, url, perl = TRUE)
+      }
+
+      if(!grepl("&cursor=", url) == TRUE){
+        nxt_url <- paste0(url, "&cursor=", cursor)
+      }
+
+
+      if(is.null(second_key)){
+        # First API call
+        nxt_content <- callAPI(url = nxt_url, key = key, verbose = verbose)
+      }else{
+        # First API call
+        nxt_content <- leechAPI(url = nxt_url, key = key, second_key = second_key, verbose = verbose)
+      }
+
+      nxt_con  <- nxt_content$response
+
+      len <- len + length(nxt_con)
+      if (length(nxt_con)>0){ if (verbose) cat(len, "obs. ") }
+
+      # Append content lists
+      con <- base::append(con, nxt_con)
     }
 
-    if(!grepl("&cursor=", url) == TRUE){
-      nxt_url <- paste0(url, "&cursor=", cursor)
+    return(con)
+
     }
-
-
-    if(is.null(second_key)){
-      # First API call
-      nxt_content <- callAPI(url = nxt_url, key = key, verbose = verbose)
-    }else{
-      # First API call
-      nxt_content <- leechAPI(url = nxt_url, key = key, second_key = second_key, verbose = verbose)
-    }
-
-    nxt_con  <- nxt_content$response
-
-    len <- len + length(nxt_con)
-    if (length(nxt_con)>0){ if (verbose) cat(len, "obs. ") }
-
-    # Append content lists
-    con <- base::append(con, nxt_con)
-  }
-
-  return(con)
 
 }
 
