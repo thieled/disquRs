@@ -373,7 +373,9 @@ paginateAPI <- function(url,
 
   # Check if cursor exists
   if (is.null(content$cursor)){
+
     return(con)
+
     } else {
 
     # Check if there's more
@@ -471,14 +473,26 @@ get_generic <- function(ressource,
   format <- match.arg(format, c("tidy", "raw"))
 
   if(format == "tidy"){
-    con <- do.call(rbind, con) |> tibble::as_tibble()
-    con <- unnest_recursively(con)
-    return(con)
+    # Check if returned content contains 1 observation (=> simple rbind; 1 row df)
+    if(all(sapply(con, is.list))){
+
+      con <- do.call(rbind, con) |> tibble::as_tibble()
+      con <- unnest_recursively(con)
+      return(con)
+
+    }else{ # ...or more (=> do.call(rbind, l); multiple rows df)
+
+      con <- rbind(con) |> as.data.frame()
+      con <- unnest_recursively(con)
+      return(con)
+    }
+
   }
 
   if(format == "raw"){
     return(con)
   }
+
 }
 
 
