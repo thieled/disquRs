@@ -3,6 +3,6 @@
 export(callAPI)
 export(generateURL)
 export(get_generic)
-export(get_thread_list)
+export(get_threads)
 export(leechAPI)
 export(paginateAPI)

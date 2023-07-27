@@ -85,12 +85,12 @@ generateURL <- function(
   url <- paste0(url, ressource, "/")
 
   # Add option and type
-  url <- paste0(url, option, ".", type)
+  url <- paste0(url, option, ".", type, "?")
 
 
   # Add key placeholder if none provided
   if (is.null(key)){
-    url <- paste0(url, "?api_key=YOURAPPKEY", key)
+    url <- paste0(url, "api_key=YOURAPPKEY", key)
   }
 
   # Stop if key not provided as string
@@ -99,7 +99,7 @@ generateURL <- function(
   }
 
   if (!is.null(key) && is.character(key)){
-    url <- paste0(url, "?api_key=", key)
+    url <- paste0(url, "api_key=", key)
   }
 
   ### Object parameters
@@ -248,9 +248,22 @@ callAPI <- function(url,
     stop("Error: No URL specified.")
   }
 
-  # Replace api key
-  newkey <- paste0("json?api_key=", key)
-  url <- gsub("json.+(?=\\&)", newkey, url, perl = TRUE)
+  # Check if key is provided
+  if(!is.null(key)){
+
+    if (!grepl("api_key=", url)) { # Insert key if url does not contain "api_key"
+      url <- sub("\\?", paste0("?api_key=", key, "&"), url)
+    } else {
+      # If "api_key=" exists, replace it with the new key
+      url <- gsub("api_key=[^&]*", paste0("api_key=", key), url)
+    }
+
+  }else{ # If no key is provided
+    if (!grepl("api_key=", url)) { # And url does not conatin key - Stop
+      stop("Error: No API key provided.")
+    }
+  }
+
 
   # Call API
   tryCatch(

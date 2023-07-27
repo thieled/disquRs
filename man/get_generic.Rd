@@ -48,5 +48,5 @@ This function is a wrapper around other functions in the package, providing a ge
 
 }
 \seealso{
-\code{generateURL}, \code{paginateAPI}, \code{unnest_recursively}
+\code{generateURL}, \code{paginateAPI}
 }

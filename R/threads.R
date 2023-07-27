@@ -1,9 +1,16 @@
-#' Call the threads endpoint of the Disqus API.
+#' Get data from the Disqus API for a specific thread.
 #'
-#' This function retrieves a list of threads from the Disqus API for the specified thread identifier and forum (optional).
-#' The data is returned in either a 'tidy', unnested format or 'raw' (JSON) format.
+#' This function retrieves data from the Disqus API for a specific thread identified by its thread identifier. The API call can be customized by specifying the desired 'option' to perform different operations on the thread. The data is returned in either a 'tidy', unnested format or 'raw' (JSON) format.
 #'
-#' @param thread Character vector containing the thread identifier or link. If a link is provided, 'forum' is required.
+#' @param thread Character vector containing the thread identifier.
+#' @param option Character vector specifying the specific API operation to perform on the thread:
+#' \itemize{
+#'   \item \code{"list"}: List threads.
+#'   \item \code{"listHot"}: List hot threads.
+#'   \item \code{"listPopular"}: List popular threads.
+#'   \item \code{"listPosts"}: List posts for the thread.
+#'   \item \code{"details"}: Get details about the thread.
+#' }
 #' @param forum Character vector containing the forum identifier or shortname (default is NULL).
 #' @param key Character vector containing the primary API key to authenticate the API call(s).
 #' @param second_key Character vector containing a second API key to use if the hourly API limit is reached with the primary key (default is NULL).
@@ -13,17 +20,22 @@
 #' @param format Character vector specifying the desired output format: 'tidy' (unnested) or 'raw' (JSON) (default is 'tidy').
 #' @param ... Additional arguments to be passed to the `generateURL` function for URL generation.
 #'
-#' @return The retrieved list of threads from the Disqus API in the specified format.
+#' @return The retrieved data from the Disqus API for the specific thread in the specified format.
 #'
-#' @seealso `generateURL`, `paginateAPI`, `get_generic`, `unnest_recursively`
+#' @seealso `generateURL`, `paginateAPI`, `get_generic`
 #'
 #' @examples
 #' # Retrieve a list of threads in 'tidy' format using the primary key
-#' # tidy_threads <- get_thread_list(thread = "thread_id", key = "YOURAPPKEY")
+#' # tidy_threads <- get_threads(thread = "thread_id", option = "list", key = "YOURAPPKEY")
 #'
 #' @export
 get_threads <- function(thread,
-                        option = c("tidy", "raw")
+                        option = c("list",
+                                   "listHot",
+                                   "listPopular",
+                                   "listPosts",
+                                   "details"
+                        ),
                         forum = NULL,
                         key,
                         second_key = NULL,
