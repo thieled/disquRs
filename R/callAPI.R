@@ -438,7 +438,7 @@ paginateAPI <- function(url,
 #'
 #' @return The retrieved data from the Disqus API in the specified format.
 #'
-#' @seealso `generateURL`, `paginateAPI`, `unnest_recursively`
+#' @seealso `generateURL`, `paginateAPI`
 #'
 #' @examples
 #' # Retrieve data in 'tidy' format using the primary key
@@ -473,19 +473,10 @@ get_generic <- function(ressource,
   format <- match.arg(format, c("tidy", "raw"))
 
   if(format == "tidy"){
-    # Check if returned content contains 1 observation (=> simple rbind; 1 row df)
-    if(all(sapply(con, is.list))){
 
-      con <- do.call(rbind, con) |> tibble::as_tibble()
-      con <- unnest_recursively(con)
-      return(con)
+    con <- fleece::rectangularize(con)
 
-    }else{ # ...or more (=> do.call(rbind, l); multiple rows df)
-
-      con <- rbind(con) |> as.data.frame()
-      con <- unnest_recursively(con)
-      return(con)
-    }
+    return(con)
 
   }
 

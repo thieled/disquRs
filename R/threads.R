@@ -1,9 +1,9 @@
-#' Get a list of threads from the Disqus API.
+#' Call the threads endpoint of the Disqus API.
 #'
 #' This function retrieves a list of threads from the Disqus API for the specified thread identifier and forum (optional).
 #' The data is returned in either a 'tidy', unnested format or 'raw' (JSON) format.
 #'
-#' @param thread Character vector containing the thread identifier.
+#' @param thread Character vector containing the thread identifier or link. If a link is provided, 'forum' is required.
 #' @param forum Character vector containing the forum identifier or shortname (default is NULL).
 #' @param key Character vector containing the primary API key to authenticate the API call(s).
 #' @param second_key Character vector containing a second API key to use if the hourly API limit is reached with the primary key (default is NULL).
@@ -22,20 +22,21 @@
 #' # tidy_threads <- get_thread_list(thread = "thread_id", key = "YOURAPPKEY")
 #'
 #' @export
-get_thread_list <- function(thread,
-                            forum = NULL,
-                            key,
-                            second_key = NULL,
-                            verbose = TRUE,
-                            n = 100,
-                            limit = 25,
-                            format = c("tidy", "raw"),
-                            ...){
+get_threads <- function(thread,
+                        option = c("tidy", "raw")
+                        forum = NULL,
+                        key,
+                        second_key = NULL,
+                        verbose = TRUE,
+                        n = 100,
+                        limit = 25,
+                        format = c("tidy", "raw"),
+                        ...){
 
   format <- match.arg(format, c("tidy", "raw"))
 
   res <- get_generic(ressource = "threads",
-                     option = "list",
+                     option = option,
                      thread = thread,
                      forum = forum,
                      key = key,
